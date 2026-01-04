@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ravi YT Music Downloader</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="overlay">
+<h1>Ravi YT Music Downloader</h1>
+
+<input id="search" placeholder="Search YouTube song/video">
+<button onclick="doSearch()">Search</button>
+
+<div id="results"></div>
+
+<iframe id="player" allowfullscreen></iframe>
+
+<select id="quality">
+<option value="128">MP3 128kbps</option>
+<option value="192">MP3 192kbps</option>
+<option value="320">MP3 320kbps</option>
+</select>
+
+<button onclick="download('mp3')">Download MP3</button>
+<button onclick="download('mp4')">Download MP4</button>
+
+<footer>
+<a href="https://wa.link/t9ramk" target="_blank">
+<img src="assets/whatsapp.png" alt="WhatsApp">
+</a>
+<a href="https://www.facebook.com/profile.php?id=100000951018552" target="_blank">
+<img src="assets/facebook.png" alt="Facebook">
+</a>
+</footer>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
