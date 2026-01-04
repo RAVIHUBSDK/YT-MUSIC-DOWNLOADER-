@@ -2,7 +2,8 @@ const express = require("express");
 const yts = require("yt-search");
 const fs = require("fs");
 const session = require("express-session");
-const ytdlp = require("yt-dlp-exec");
+const YtDlpWrap = require("yt-dlp-wrap").default; // ✅ use yt-dlp-wrap
+const path = require("path");
 
 const app = express();
 app.use(express.json());
@@ -18,14 +19,14 @@ app.use(express.static("public"));
 
 // 🔐 AUTH CHECK
 function auth(req, res, next) {
-  if(req.session.login) return next();
+  if (req.session.login) return next();
   res.redirect("/login.html");
 }
 
 // LOGIN ROUTE
-app.post("/login", (req,res)=>{
-  const {username,password} = req.body;
-  if(username==="Ravi-king" && password==="957946"){
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  if (username === "Ravi-king" && password === "957946") {
     req.session.login = true;
     res.redirect("/");
   } else {
@@ -34,35 +35,45 @@ app.post("/login", (req,res)=>{
 });
 
 // Protect main site
-app.get("/", auth, (req,res)=>{
-  res.sendFile(__dirname+"/public/index.html");
+app.get("/", auth, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // YouTube search
-app.post("/search", auth, async (req,res)=>{
-  const r = await yts(req.body.query);
-  res.json(r.videos.slice(0,6));
-});
-
-// Download video/audio
-app.post("/download", auth, async (req,res)=>{
-  const { url, type, quality } = req.body;
-  fs.mkdirSync("temp",{recursive:true});
-  const out = "temp/file.%(ext)s";
-
-  try{
-    await ytdlp(url,{
-      x: type==="mp3",
-      f: type==="mp4" ? "mp4" : undefined,
-      o: out,
-      audio_format: type==="mp3" ? "mp3" : undefined,
-      audio_quality: type==="mp3" ? quality : undefined
-    });
-    const file = fs.readdirSync("temp")[0];
-    res.download("temp/"+file, ()=> fs.rmSync("temp",{recursive:true,force:true}));
-  }catch(err){
+app.post("/search", auth, async (req, res) => {
+  try {
+    const r = await yts(req.body.query);
+    res.json(r.videos.slice(0, 6));
+  } catch (err) {
     res.status(500).send(err.message);
   }
 });
 
-app.listen(3000,()=>console.log("Server running on 3000"));
+// Download video/audio
+app.post("/download", auth, async (req, res) => {
+  const { url, type, quality } = req.body;
+  fs.mkdirSync("temp", { recursive: true });
+  const out = "temp/file.%(ext)s";
+
+  const ytdlp = new YtDlpWrap(); // create yt-dlp instance
+
+  const args = [];
+  if (type === "mp3") {
+    args.push("-x", "--audio-format", "mp3", "--audio-quality", quality, "-o", out, url);
+  } else {
+    args.push("-f", "mp4", "-o", out, url);
+  }
+
+  try {
+    await ytdlp.exec(args);
+    const file = fs.readdirSync("temp")[0];
+    res.download(path.join("temp", file), () =>
+      fs.rmSync("temp", { recursive: true, force: true })
+    );
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
