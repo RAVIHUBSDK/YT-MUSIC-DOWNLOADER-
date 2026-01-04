@@ -1,0 +1,40 @@
+body {
+  margin:0;
+  background:url('assets/bg.jpg') center/cover no-repeat fixed;
+  font-family:Arial,sans-serif;
+  color:white;
+}
+.overlay {
+  min-height:100vh;
+  padding:20px;
+  text-align:center;
+  background:rgba(0,0,0,0.6);
+}
+input,button,select {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:8px;
+  border:none;
+}
+button {
+  background:#22c55e;
+  font-weight:bold;
+}
+#results div {
+  background:#111;
+  margin:6px 0;
+  padding:8px;
+  border-radius:6px;
+  cursor:pointer;
+}
+iframe {
+  width:100%;
+  height:220px;
+  margin:10px 0;
+  border-radius:10px;
+}
+footer img {
+  width:40px;
+  margin:10px;
+}
